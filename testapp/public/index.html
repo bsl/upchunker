@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <style>
+#logConsole {
+  height: 40ch;
+  width: 100%;
+  overflow: scroll;
+  background: #101010;
+  color: #e0e0e0;
+  font-family: "JetBrains Mono";
+  font-size: 10px;
+}
+    </style>
+  </head>
+  <body>
+    <div>
+      <input id="fileSelect" type="file" multiple />
+    </div>
+    <pre id="logConsole"></pre>
+  </body>
+
+  <script type="module">
+    import Upchunker from "./upchunker.js";
+
+    const logConsole = document.getElementById("logConsole");
+
+    const logCb = function (level, text) {
+      logConsole.innerHTML += `${level.toUpperCase()} ${text}\n`;
+      logConsole.scrollTop = logConsole.scrollHeight;
+    }
+    const fileDigestProgressCb = function (filename, m, n, f) {
+      logCb("info", `${filename} digest ${m}/${n} ${Math.round(f * 100)}%`)
+    }
+    const chunkDigestProgressCb = function (filename, m, n, f) {
+      logCb("info", `${filename} chunk digests ${m}/${n} ${Math.round(f * 100)}%`)
+    }
+    const uploadProgressCb = function (filename, m, n, f) {
+      logCb("info", `${filename} uploaded ${m}/${n} ${Math.round(f * 100)}%`)
+    }
+
+    const fileSelect = document.getElementById("fileSelect");
+    let upchunker;
+    fileSelect.addEventListener("change", function () {
+      upchunker = new Upchunker(this.files, {
+        endpoint: "http://localhost:3000/upload",
+        chunkSize: 1 * 1024 * 1024,
+        numSimultaneousUploads: 2,
+        logCb: logCb,
+        fileDigestProgressCb: fileDigestProgressCb,
+        chunkDigestProgressCb: chunkDigestProgressCb,
+        uploadProgressCb: uploadProgressCb,
+      });
+      upchunker.upload().then(() => {
+        logCb("info", "upload finished");
+      })
+      .catch((err) => {
+        logCb("error", `error: ${err}`);
+      });
+    });
+  </script>
+</html>
