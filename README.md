@@ -3,6 +3,12 @@
 `upchunker` is a Javascript library that implements [a simple
 protocol](PROTOCOL.md) for uploading files in chunks.
 
+It generates cryptographic digests for files locally to ensure
+integrity, and is capable of uploading multiple chunks in
+parallel.
+
+Warning: alpha quality. Expect bugs and API changes.
+
 ## Development cheat sheet
 
 - `bun install`
