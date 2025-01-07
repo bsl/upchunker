@@ -69,7 +69,7 @@ class UploadController < ApplicationController
     dir = "/tmp/#{upload_id}"
     FileUtils.mkdir_p(dir)
     chunk_path = "#{dir}/chunk.#{chunk_num}.#{chunk_digest}"
-    FileUtils.mv(params["file"], chunk_path)
+    FileUtils.mv(params["file"].tempfile, chunk_path)
     render(body: nil, status: 200)
   end
 
