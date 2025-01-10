@@ -36,22 +36,12 @@ class UploadController < ApplicationController
     return bad_request unless file_num_chunks = get_param_file_num_chunks(params)
     return bad_request unless file_digest     = get_param_file_digest(params)
 
-    if upload = Upload.where(
-      file_name: file_name,
-      file_size: file_size,
-      file_num_chunks: file_num_chunks,
-      file_digest: file_digest
-    ).first
-      return render(json: { "uploadId" => upload.uuid })
-    end
-
-    upload = Upload.new(
+    upload = Upload.find_or_create_by(
       file_name: file_name,
       file_size: file_size,
       file_num_chunks: file_num_chunks,
       file_digest: file_digest
     )
-    upload.save
     render(json: { "uploadId" => upload.uuid })
   end
 
